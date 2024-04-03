@@ -9,7 +9,7 @@ def order100(elems):
     n, u0 = elems
 
     machine = [[]] * (n + 1)
-    machine_queue = [i for i in range(1, n + 2)]
+    machine_queue = [i for i in range(1, n + 1)]
     heapq.heapify(machine_queue)
 
     queue = []
@@ -146,3 +146,8 @@ for _ in range(q):
         order400(elem)
     elif order == 500:
         order500(elem)
+
+    # print()
+    # print(order, elem)
+    # print("queue : ", queue)
+    # print("domain_checker : ", domain_checker)
