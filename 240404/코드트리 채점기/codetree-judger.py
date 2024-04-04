@@ -4,7 +4,7 @@ import sys
 
 
 def order100(elems):
-    global machine, machine_queue, queue, domain_checker
+    global machine, machine_queue, queue, url_set, domain_checker
 
     n, u0 = elems
 
@@ -15,6 +15,10 @@ def order100(elems):
     queue = []
     heapq.heappush(queue, [1, 0, u0])
 
+    # 해당 url이 있는 지 확인하기 위한 set 자료구조
+    url_set = set()
+    url_set.add(u0)
+
     domain_checker = {}
 
     return
@@ -24,11 +28,11 @@ def order200(elems):
     t, p, u = elems
 
     # url 기준으로 같으면 넣지 않음
-    for _, _, url in queue:
-        if url == u:
-            return
+    if u in url_set:
+        return
 
     heapq.heappush(queue, [p, t, u])
+    url_set.add(u)
 
     return
 
@@ -42,6 +46,7 @@ def order300(elems):
 
     # 만약 뽑은 애가 우선순위가 아닌 경우
     tmp = []
+
     while True:
         if not queue:
             break
@@ -49,12 +54,16 @@ def order300(elems):
         p, t0, u = heapq.heappop(queue)
         d = u.split("/")[0]
 
+        # 당장 채점하지 못하는 경우
         if d in domain_checker and (domain_checker[d] == -1 or domain_checker[d] > t):
-            tmp.append([p, t0, d])
+            tmp.append([p, t0, u])
         # task 배정
         else:
             # -1은 채점중
             domain_checker[d] = -1
+
+            # url도 빼줌
+            url_set.remove(u)
 
             num = heapq.heappop(machine_queue)
             machine[num] = [d, t]
@@ -144,8 +153,3 @@ for _ in range(q):
         order400(elem)
     elif order == 500:
         order500(elem)
-
-    # print()
-    # print(order, elem)
-    # print("queue : ", queue)
-    # print("domain_checker : ", domain_checker)
