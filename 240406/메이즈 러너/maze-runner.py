@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
 import sys
-from collections import deque
 
 
 def print_map(patch):
@@ -58,38 +57,30 @@ def move():
     return
 
 
-def bfs():
-    visited = [[0 for _ in range(n)] for _ in range(n)]
-    init_x, init_y = exit_loc
+def choose():
+    people = []
+    min_distance = 20
 
-    queue = deque()
-    queue.append((init_x, init_y))
-    visited[init_x][init_y] = 1
-    while queue:
-        x, y = queue.popleft()
-        for i in range(4):
-            nx = x + dx[i]
-            ny = y + dy[i]
+    exit_x, exit_y = exit_loc
+    for x, y in participant:
+        d = max(abs(x - exit_x), abs(y - exit_y))
+        if d < min_distance:
+            min_distance = d
+            people.append([x, y])
+        elif d == min_distance:
+            people.append([x, y])
 
-            if nx < 0 or nx >= n or ny < 0 or ny >= n:
-                continue
-            if visited[nx][ny]:
-                continue
+    # 작은 순 정렬
+    people.sort(key=lambda x: (x[0], x[1]))
 
-            if (nx, ny) in participant:
-                return (nx, ny), visited[x][y]
-
-            queue.append((nx, ny))
-            visited[nx][ny] = visited[x][y] + 1
-
-    return
+    return people[0], min_distance
 
 
 def rotate():
     global exit_loc, participant
 
     # 정사각형 구하기
-    (tx, ty), d = bfs()
+    [tx, ty], d = choose()
     exit_x, exit_y = exit_loc
 
     # 좌상단이 0보다 작아지는 경우 처리
@@ -99,7 +90,15 @@ def rotate():
         [lr_x, lr_y] = [ul_x + d, ul_y + d]
 
     # 돌아갈 patch 떼오기
+    # print(f"(tx, ty), d : {(tx, ty), d}")
+    # print(f"exit_loc : {exit_loc}")
+    # print(f" ul_x, ul_y : {ul_x, ul_y}, lr_x, lr_y: {lr_x, lr_y}")
+
     new_rec = [map_lst[i][ul_y : lr_y + 1] for i in range(ul_x, lr_x + 1)]
+
+    # print("new_rec :")
+    # print_map(new_rec)
+
     for x in range(d + 1):
         for y in range(d + 1):
             # 내구도 감소
@@ -192,11 +191,29 @@ x, y = map(int, sys.stdin.readline().split())
 exit_loc = (x - 1, y - 1)
 answer = 0
 
+# print_map(map_lst)
+
 for time in range(k):
+    # print(f"time: {time}")
+    # print()
+
     move()
-    rotate()
+    # print("move")
+    # print("participant : ", participant)
+    # print("exit_loc : ", exit_loc)
+    # print_map(map_lst)
 
     if not participant:
         break
+
+    rotate()
+    # print("rotate")
+    # print("participant : ", participant)
+    # print_map(map_lst)
+
+    # print("answer : ", answer)
+    # print("exit_loc : ", exit_loc)
+    # print_map(map_lst)
+    # print()
 
 cal_answer()
