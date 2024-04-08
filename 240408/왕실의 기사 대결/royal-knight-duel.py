@@ -180,7 +180,7 @@ for idx in range(n):
 
 # i번 기사, d번 방향
 order = []
-for _ in range(n):
+for _ in range(q):
     i, d = map(int, sys.stdin.readline().split())
     order.append([i - 1, d])
 
