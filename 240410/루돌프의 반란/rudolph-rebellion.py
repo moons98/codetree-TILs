@@ -29,7 +29,7 @@ def interaction(x, y, dx, dy):
     ny = y + dy
 
     # 산타가 밖으로 밀려난 경우
-    if x < 0 or x >= N or y < 0 or y >= N:
+    if nx < 0 or nx >= N or ny < 0 or ny >= N:
         santa[idx] = (-1, -1)
         return
 
