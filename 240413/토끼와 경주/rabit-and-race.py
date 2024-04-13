@@ -92,7 +92,6 @@ def get_up_rabbit(cur_rabbit, dis):
 
     # 끝에서부터 올라오는 모션
     up_rabbit.x -= dis
-    dis = 0
 
     return up_rabbit
 
@@ -121,7 +120,6 @@ def get_down_rabbit(cur_rabbit, dis):
 
     # 처음에서부터 내려가는 모션
     down_rabbit.x += dis
-    dis = 0
 
     return down_rabbit
 
@@ -142,7 +140,7 @@ def get_left_rabbit(cur_rabbit, dis):
 
     # 오른쪽 가는 모션
     if dis >= m - left_rabbit.y:
-        dis -= left_rabbit.y - 1
+        dis -= m - left_rabbit.y
         left_rabbit.y = m
     else:
         left_rabbit.y += dis
@@ -150,7 +148,6 @@ def get_left_rabbit(cur_rabbit, dis):
 
     # 오른쪽 -> 왼쪽 모션
     left_rabbit.y -= dis
-    dis = 0
 
     return left_rabbit
 
@@ -179,7 +176,6 @@ def get_right_rabbit(cur_rabbit, dis):
 
     # 왼쪽 -> 오른쪽 모션
     right_rabbit.y += dis
-    dis = 0
 
     return right_rabbit
 
