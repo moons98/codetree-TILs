@@ -2,6 +2,8 @@
 import heapq
 import sys
 
+MAX_INT = sys.maxsize
+
 
 def order100(elem):
     global machine, machine_queue, queue, url_set, domain_dict
@@ -16,14 +18,22 @@ def order100(elem):
     machine_queue = [i for i in range(1, n + 1)]
     heapq.heapify(machine_queue)
 
-    # 채점 대기 큐 : [p, t, u]
-    queue = []
-    heapq.heappush(queue, [1, 0, u0])
+    # 채점 대기 큐 : {d0 : [[p, t, u] ...], ...}
+    queue = {}
+
+    # 도메인 없으면 만들어주기
+    d0 = u0.split("/")[0]
+    if d0 not in queue:
+        queue[d0] = []
+
+    # 해당 도메인 우선순위 큐에 저장
+    heapq.heappush(queue[d0], [1, 0, u0])
 
     # 대기큐에 존재하는 url set
     url_set = set()
     url_set.add(u0)
 
+    # 도메인을
     # 채점중인 domain의 dict(domain : time+3*gap)
     domain_dict = {}
 
@@ -38,9 +48,23 @@ def order200(elem):
     if u in url_set:
         return
 
+    # 도메인 이미 있는지 확인
+    d = u.split("/")[0]
+    if d not in queue:
+        queue[d] = []
+
     # 대기 큐에 삽입
     url_set.add(u)
-    heapq.heappush(queue, [p, t, u])
+    heapq.heappush(queue[d], [p, t, u])
+
+    return
+
+
+def compare(a, b):
+    if a[0] != b[0]:
+        return a[0] < b[0]
+    elif a[1] != b[1]:
+        return a[1] < b[1]
 
     return
 
@@ -52,37 +76,37 @@ def order300(t):
     if not machine_queue:
         return
 
-    # 채점 불가능한 문제 다시 넣기 위한 리스트
-    tmp = []
-
-    # 우선순위 높은 문제를 뽑아서 가능할 때까지 확인
-    while queue:
-        # 가장 우선순위 높은 문제
-        [p0, t0, u0] = heapq.heappop(queue)
-
-        # 문제 도메인
-        d = u0.split("/")[0]
-
-        # 채점 불가 조건 : domain 채점중(d:-1), domain 재채점 가능 시간이 아직 안된 경우
+    # 채점 가능한 도메인 중 우선순위 가장 높은 문제 찾기 (p 작을수록 >> t 작을수록)
+    problem0, d0 = [MAX_INT, MAX_INT, ""], ""
+    for d in queue:
+        # domain이 채점중 or 시간 안됨
         if (d in domain_dict) and (domain_dict[d] == -1 or t < domain_dict[d]):
-            tmp.append([t0, p0, u0])
             continue
 
-        # 채점 가능
-        else:
-            m = heapq.heappop(machine_queue)
+        # domain에 해당하는 채점 가능한 문제가 없음
+        if not queue[d]:
+            continue
 
-            # 대기큐 정보 삭제
-            url_set.remove(u0)
+        # 각 도메인의 가장 우선순위 높은 문제 정보 비교
+        problem1 = queue[d][0]
+        if not compare(problem0, problem1):
+            problem0 = problem1
+            d0 = d
 
-            # 채점중 표시
-            machine[m] = [t, d]
-            domain_dict[d] = -1
-            break
+    # 채점 진행
+    if d0:
+        # 우선순위 가장 높은 문제 pop
+        [_, _, u0] = heapq.heappop(queue[d0])
 
-    # 채점 못했던 문제들 다시 넣어줌
-    for i in tmp:
-        heapq.heappush(queue, i)
+        # machine 뽑기
+        m = heapq.heappop(machine_queue)
+
+        # 대기큐 정보 삭제
+        url_set.remove(u0)
+
+        # 채점중 표시
+        machine[m] = [t, d0]
+        domain_dict[d0] = -1
 
     return
 
@@ -108,9 +132,11 @@ def order400(elem):
 
 
 def order500(t):
-    t = int(t)
+    num = 0
+    for d in queue:
+        num += len(queue[d])
 
-    p_answer.append(len(queue))
+    p_answer.append(num)
 
     return
 
@@ -144,6 +170,11 @@ def order500(t):
 5. 채점 대기 큐 조회
     - 대기 큐에 있는 task 수 출력
     
+    
+실패 분석 :
+    - 의미없는 pop, push 과정이 많았음
+    - 도메인이 같거나 현재 시간에 이용 불가능하면 그 도메인은 통째로 날려야 함
+    - 즉, 우선순위 큐를 도메인 별로 운영해야 함 [p, t, u]
 """
 
 q = int(sys.stdin.readline())
