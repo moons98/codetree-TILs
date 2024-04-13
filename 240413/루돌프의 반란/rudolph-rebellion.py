@@ -135,7 +135,7 @@ def collide(idx, loc, dir, s):
 
     # 다른 산타와 만난 경우 상호작용
     new_idx = map_lst[nx][ny]
-    if new_idx:
+    if new_idx and new_idx != idx:
         interaction((nx, ny), (dx, dy))
 
     return
@@ -256,6 +256,7 @@ for _ in range(P):
 
 # print("santa: ", santa)
 # print("rudolf: ", rudolf)
+# print_map()
 
 # 게임 진행
 for i in range(M):
