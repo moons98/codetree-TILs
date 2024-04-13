@@ -25,6 +25,9 @@ def move_rudolf():
 
     # 가장 가까운 산타, r 클수록 >> c 클수록 우선순위
     for r, c in santa:
+        if (r, c) == (-1, -1):
+            continue
+
         d = (rx - r) ** 2 + (ry - c) ** 2
         if d < max_d:
             (max_r, max_c) = (r, c)
@@ -274,6 +277,7 @@ for i in range(M):
     # print("santa: ", santa)
     # print("rudolf: ", rudolf)
     # print("stun_santa: ", stun_santa)
+    # print("score: ", score)
     # print_map()
 
 for i in score[1:]:
